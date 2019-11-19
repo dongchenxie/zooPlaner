@@ -11,7 +11,7 @@ namespace zooPlaner.Animal
         public string subCategoryName { set; get; }
         protected string typeName { set; get; }
         public category parent { private set; get; }
-        public string _food;
+        private string _food;
         public string food
         {
             set
@@ -26,13 +26,52 @@ namespace zooPlaner.Animal
                 }
                 else
                 {
-
+                    return _food;
                 }
                
             }
         }
-        public double ratio { set; get; }
-        public string time { set; get; }
+
+        private string _ratio;
+        public string ratio
+        {
+            set
+            {
+                _ratio = value;
+            }
+            get
+            {
+                if (_ratio == null)
+                {
+                    return parent.ratio;
+                }
+                else
+                {
+                    return _ratio;
+                }
+
+            }
+        }
+        private string _time;
+        public string time
+        {
+            set
+            {
+                _time = value;
+            }
+            get
+            {
+                if (_time == null)
+                {
+                    return parent.time;
+                }
+                else
+                {
+                    return _time;
+                }
+
+            }
+        }
 
 
         public category(string typeName)
