@@ -1,116 +1,110 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace zooPlaner.Animal
+namespace zooPlaner
 {
 
     class category
     {
-        public List<category> subCategory { private set; get; }
+        private List<category> subCategory;
         public string subCategoryName { set; get; }
         protected string typeName { set; get; }
         public category parent { private set; get; }
-        private string _food;
-        public string food
-        {
-            set
-            {
-                _food = value;
-            }
-            get
-            {
-                if (_food == null)
-                {
-                    return parent.food;
-                }
-                else
-                {
-                    return _food;
-                }
-               
-            }
-        }
-
-        private string _ratio;
-        public string ratio
-        {
-            set
-            {
-                _ratio = value;
-            }
-            get
-            {
-                if (_ratio == null)
-                {
-                    return parent.ratio;
-                }
-                else
-                {
-                    return _ratio;
-                }
-
-            }
-        }
-        private string _time;
-        public string time
-        {
-            set
-            {
-                _time = value;
-            }
-            get
-            {
-                if (_time == null)
-                {
-                    return parent.time;
-                }
-                else
-                {
-                    return _time;
-                }
-
-            }
-        }
+        public JObject info { private set; get; }
 
 
         public category(string typeName)
         {
             this.typeName = typeName;
             this.subCategoryName = null;
+            subCategory = new List<category>();
 
         }
         public category(string typeName, string subCategoryName)
         {
             this.typeName = typeName;
             this.subCategoryName = subCategoryName;
-
+            subCategory = new List<category>();
+            
+        }
+        public category(string typeName, string subCategoryName,JObject info)
+        {
+            this.typeName = typeName;
+            this.subCategoryName = subCategoryName;
+            subCategory = new List<category>();
+            this.info = info;
+        }
+        public double getFoodWeight(double bodyWeight)
+        {
+            return Math.Round(bodyWeight * (double)this.getInfo("ratio"), 3);
+        }
+        public string getServing(double bodyWeight)
+        {
+            return "Serving: "+getFoodWeight(bodyWeight) + " KG " + this.getInfo("food");
+        }
+        public string getInstructions()
+        {
+            return this.getInfo("notes") + "\n" + this.getInfo("time");
         }
         public override string ToString()
         {
             return typeName;
         }
+        public JToken getInfo(string infoName)
+        {
+            if (info.GetValue(infoName) != null)
+            {
+                return info.GetValue(infoName);
+            }
+            return parent.info.GetValue(infoName);
+        }
+        public category getSubElement(int index)
+        {
+            return subCategory[index-1];
+        }
+        public void printSubElementList()
+        {
+            for(int i = 0; i < subCategory.Count; i++)
+            {
+                Console.WriteLine((i + 1) +"."+subCategory[i]);
+            }
+        }
+        public category newSubElement(string typeName, string subCategoryName, JObject info)
+        {
+            category c = new category(typeName, subCategoryName, info);
+            subCategory.Add(c);
+            c.parent = this;
+            return c;
+        }
         public category newSubElement(string typeName, string subCategoryName)
         {
             category c = new category(typeName, subCategoryName);
             subCategory.Add(c);
+            c.parent = this;
             return c;
         }
         public category newSubElement(string typeName)
         {
             return newSubElement(typeName, null);
         }
-        public void printCategoryToRoot()
+        public string printCategoryToRoot()
         {
+           
             string tempSubCategoryName = subCategoryName == null ? "" : "\n" + subCategoryName;
             if (parent != null)
             {
-                parent.printCategoryToRoot();
+                return parent.printCategoryToRoot()+ " : " + typeName + tempSubCategoryName;
 
-                Console.WriteLine(" : " + typeName + tempSubCategoryName);
+                
+            }
+            else
+            {
+                return tempSubCategoryName;
             }
 
-            Console.WriteLine(tempSubCategoryName);
+           
         }
     }
 }
