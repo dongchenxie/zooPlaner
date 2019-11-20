@@ -5,9 +5,68 @@ namespace zooPlaner
 {
     class Program
     {
+
+        static category root;
         static void Main(string[] args)
         {
-            category root = setup();
+            root = setup();
+            runPlan(root);
+        }
+        static void runPlan(category c)
+        {
+            if (c.subCategoryName == null)
+            {
+                Console.WriteLine("Please input the weight in KG:");
+                try
+                {
+                    double input = double.Parse(Console.ReadLine());
+                    printMealRecommendation(c, input);
+                    Console.WriteLine("Do you want to try another animal? input q to quit, any other key to continue.");
+                    if (Console.ReadLine() == "q")
+                    {
+                        System.Environment.Exit(1);
+                    }
+                    else
+                    {
+                        runPlan(root);
+                    }
+
+                }catch(System.FormatException e)
+
+                {
+                    Console.WriteLine(e.Message);
+                    runPlan(c);
+                }
+              
+            }
+            else
+            {
+                c.printTitle();
+                c.printSubElementList();
+                Console.WriteLine("selection:");
+                try
+                {
+                    int input = int.Parse(Console.ReadLine());
+                    category nextNode = c.getSubElement(input);
+                    if (nextNode == null) {
+                        throw new System.FormatException("Input: "+input+" is out of boundary.");
+                    }
+                    else
+                    {
+                        runPlan(nextNode);
+                    }
+                   
+                }
+                catch (System.FormatException e)
+
+                {
+                    Console.WriteLine(e.Message);
+                    runPlan(c);
+                }
+            }
+
+
+
         }
         static category setup()
         {
@@ -19,7 +78,7 @@ namespace zooPlaner
             JObject squirrelMonkeyInfo = JObject.Parse(@"{ 'ratio':0.006}");
             JObject howlerMonkeyInfo = JObject.Parse(@"{ 'ratio':0.007}");
             JObject colobusMonkeyInfo = JObject.Parse(@"{ 'ratio':0.008}");
-            JObject rootInfo = JObject.Parse(@"{'notess':'Keep area secure at all times.'}");
+            JObject rootInfo = JObject.Parse(@"{'notes':'Keep area secure at all times.'}");
             category root = new category("root", "Mammal", rootInfo);
             category bear = root.newSubElement("Bear", "species", bearInfo);
             category monkey = root.newSubElement("Monkey", "species", monkeyInfo);
@@ -41,10 +100,10 @@ namespace zooPlaner
             output += $"\nWeight: {Math.Round(weight, 3)} KG\n";
             output += c.getServing(weight);
             output += c.getInstructions();
-            
+
 
             Console.WriteLine(output);
-            Console.WriteLine(c.getInfo("notess"));
+
         }
     }
 }

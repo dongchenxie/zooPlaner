@@ -36,13 +36,17 @@ namespace zooPlaner
             subCategory = new List<category>();
             this.info = info;
         }
+        public void printTitle()
+        {
+            Console.WriteLine("====================\n" + subCategoryName + "\n====================\n");
+        }
         public double getFoodWeight(double bodyWeight)
         {
             return Math.Round(bodyWeight * (double)this.getInfo("ratio"), 3);
         }
         public string getServing(double bodyWeight)
         {
-            return "Serving: "+getFoodWeight(bodyWeight) + " KG " + this.getInfo("food");
+            return "Serving: "+getFoodWeight(bodyWeight) + " KG " + this.getInfo("food")+"\n";
         }
         public string getInstructions()
         {
@@ -53,16 +57,30 @@ namespace zooPlaner
             return typeName;
         }
         public JToken getInfo(string infoName)
+
         {
+           
             if (info.GetValue(infoName) != null)
             {
+                
                 return info.GetValue(infoName);
             }
-            return parent.info.GetValue(infoName);
+            if (parent != null)
+            {
+                return parent.getInfo(infoName);
+            }
+            return null;
         }
         public category getSubElement(int index)
         {
-            return subCategory[index-1];
+            try
+            {
+                return subCategory[index - 1];
+            }
+            catch(System.ArgumentOutOfRangeException e)
+            {
+                return null;
+            }
         }
         public void printSubElementList()
         {
